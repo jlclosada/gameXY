@@ -184,8 +184,6 @@ const renderedContent = computed(() => {
   
   return html
 })
-  return marked(content)
-})
 
 function handleFileChange(event) {
   const file = event.target.files[0]
