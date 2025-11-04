@@ -8,8 +8,16 @@ from django.http import JsonResponse
 import sys
 
 def healthcheck(request):
-    print("🩺 [HEALTHCHECK] Endpoint llamado correctamente ✅", flush=True)
-    return JsonResponse({"status": "ok"})
+    """Healthcheck endpoint para Railway y otros servicios de deployment."""
+    from django.db import connection
+    try:
+        # Verificar que la BD está accesible
+        connection.ensure_connection()
+        print("🩺 [HEALTHCHECK] OK - Base de datos conectada ✅", flush=True)
+        return JsonResponse({"status": "healthy", "database": "connected"})
+    except Exception as e:
+        print(f"❌ [HEALTHCHECK] ERROR - {str(e)}", flush=True, file=sys.stderr)
+        return JsonResponse({"status": "unhealthy", "error": str(e)}, status=503)
 
 urlpatterns = [
     path('health/', healthcheck),  # 👈 el endpoint para Railway

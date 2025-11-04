@@ -31,13 +31,21 @@ EXPOSE 8000
 
 # Ejecuta migraciones y arranca Gunicorn con logs visibles
 CMD echo "🚀 Iniciando despliegue..." && \
+    echo "🔹 Variables de entorno detectadas:" && \
+    echo "PORT=${PORT}" && \
+    echo "DATABASE_URL presente: $(if [ -n "$DATABASE_URL" ]; then echo 'SI'; else echo 'NO'; fi)" && \
     echo "🔹 Aplicando migraciones de base de datos..." && \
     python manage.py migrate --noinput && \
     echo "✅ Migraciones completadas." && \
-    echo "🔹 Ejecutando verificación de salud..." && \
-    python manage.py check --deploy && \
-    echo "✅ Verificación OK. Iniciando servidor Gunicorn..." && \
-    gunicorn backend.wsgi:application --bind 0.0.0.0:${PORT:-8000} \
-    --log-level debug \
+    echo "🔹 Colectando archivos estáticos..." && \
+    python manage.py collectstatic --noinput && \
+    echo "✅ Estáticos OK. Iniciando servidor Gunicorn en puerto ${PORT:-8000}..." && \
+    gunicorn backend.wsgi:application \
+    --bind 0.0.0.0:${PORT:-8000} \
+    --workers 2 \
+    --threads 4 \
+    --timeout 120 \
+    --log-level info \
     --access-logfile - \
-    --error-logfile -
+    --error-logfile - \
+    --capture-output

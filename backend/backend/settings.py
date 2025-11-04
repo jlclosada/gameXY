@@ -14,10 +14,14 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-your-secret-key-change-in-
 
 DEBUG = os.getenv('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = os.getenv(
-    'ALLOWED_HOSTS',
-    'localhost,127.0.0.1,.railway.app,healthcheck.railway.app'
-).split(',')
+# Permitir todos los hosts en Railway (usará *.railway.app)
+if os.getenv('RAILWAY_ENVIRONMENT'):
+    ALLOWED_HOSTS = ['*']  # Railway maneja el routing
+else:
+    ALLOWED_HOSTS = os.getenv(
+        'ALLOWED_HOSTS',
+        'localhost,127.0.0.1'
+    ).split(',')
 
 
 INSTALLED_APPS = [
