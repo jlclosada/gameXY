@@ -27,4 +27,9 @@ COPY . .
 RUN python manage.py collectstatic --noinput || true
 
 # Run migrations and start server
-CMD python manage.py migrate && gunicorn backend.wsgi:application --bind 0.0.0.0:$PORT
+CMD echo "🔹 Running migrations..." && \
+    python manage.py migrate --noinput && \
+    echo "✅ Migrations complete" && \
+    echo "🔹 Starting Gunicorn server on port $PORT..." && \
+    gunicorn backend.wsgi:application --bind 0.0.0.0:$PORT --log-level debug --access-logfile - --error-logfile -
+
