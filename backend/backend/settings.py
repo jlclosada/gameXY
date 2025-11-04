@@ -126,10 +126,13 @@ if os.getenv('RAILWAY_ENVIRONMENT'):
     # En producción, usar el volumen montado en /app/media
     MEDIA_ROOT = '/app/media'
     MEDIA_URL = '/media/'
+    # Crear el directorio si no existe
+    os.makedirs(MEDIA_ROOT, exist_ok=True)
 else:
     # En desarrollo local
     MEDIA_ROOT = BASE_DIR / 'media'
     MEDIA_URL = '/media/'
+    os.makedirs(MEDIA_ROOT, exist_ok=True)
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
