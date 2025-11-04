@@ -21,8 +21,8 @@
       <div class="relative h-[400px] md:h-[500px] overflow-hidden">
         <div 
           v-if="game.banner_image" 
-          class="fixed inset-0 bg-cover bg-center"
-          :style="{ backgroundImage: `url(${game.banner_image})`, backgroundAttachment: 'fixed' }"
+          class="absolute inset-0 bg-cover bg-center bg-fixed"
+          :style="{ backgroundImage: `url(${game.banner_image})` }"
         >
           <div class="absolute inset-0 bg-gradient-to-b from-dark-950/60 via-dark-950/80 to-dark-950"></div>
         </div>

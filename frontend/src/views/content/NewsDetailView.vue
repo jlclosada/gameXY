@@ -14,8 +14,8 @@
       <div class="relative h-[400px] md:h-[500px] overflow-hidden">
         <div 
           v-if="news.featured_image" 
-          class="fixed inset-0 bg-cover bg-center"
-          :style="{ backgroundImage: `url(${news.featured_image})`, backgroundAttachment: 'fixed' }"
+          class="absolute inset-0 bg-cover bg-center bg-fixed"
+          :style="{ backgroundImage: `url(${news.featured_image})` }"
         >
           <div class="absolute inset-0 bg-gradient-to-b from-dark-950/40 via-dark-950/70 to-dark-950"></div>
         </div>
