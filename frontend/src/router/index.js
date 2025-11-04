@@ -133,8 +133,8 @@ router.beforeEach((to, from, next) => {
     next({ name: 'login' })
   } else if (to.meta.guest && authStore.isAuthenticated) {
     next({ name: 'home' })
-  } else if (to.meta.requiresGoat && !authStore.user?.is_goat) {
-    // Redirigir si la ruta requiere rol GOAT y el usuario no lo tiene
+  } else if (to.meta.requiresGoat && !authStore.user?.can_edit_content) {
+    // Redirigir si la ruta requiere permisos de edición (GOAT o Admin) y el usuario no los tiene
     next({ name: 'home' })
   } else {
     next()
