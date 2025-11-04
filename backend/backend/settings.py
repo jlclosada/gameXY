@@ -123,15 +123,24 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 if os.getenv('CLOUDINARY_URL'):
     # Usar Cloudinary en producción
     import cloudinary
-    import cloudinary.uploader
-    import cloudinary.api
     
-    CLOUDINARY_STORAGE = {
-        'CLOUDINARY_URL': os.getenv('CLOUDINARY_URL')
-    }
+    # Parsear la URL de Cloudinary
+    cloudinary_url = os.getenv('CLOUDINARY_URL')
+    
+    # Configurar Cloudinary
+    cloudinary.config(
+        cloudinary_url=cloudinary_url,
+        secure=True
+    )
     
     DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-    MEDIA_URL = '/media/'  # Cloudinary manejará las URLs automáticamente
+    
+    # Cloudinary URLs
+    CLOUDINARY_STORAGE = {
+        'CLOUD_NAME': cloudinary.config().cloud_name,
+        'API_KEY': cloudinary.config().api_key,
+        'API_SECRET': cloudinary.config().api_secret
+    }
 else:
     # Usar almacenamiento local en desarrollo
     MEDIA_URL = '/media/'
