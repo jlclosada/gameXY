@@ -156,7 +156,6 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter, RouterLink } from 'vue-router'
-import { marked } from 'marked'
 import { useAuthStore } from '@/stores/auth'
 import api from '@/api/axios'
 import CommentSection from '@/components/comments/CommentSection.vue'
@@ -167,22 +166,39 @@ const authStore = useAuthStore()
 const guide = ref(null)
 const loading = ref(true)
 
-// Configurar marked
-marked.setOptions({
-  breaks: true,   // Convertir \n en <br>
-  gfm: true       // GitHub Flavored Markdown
-})
-
-// Computed property para renderizar el markdown
+// Renderizado simple de Markdown con regex (igual que noticias)
 const renderedContent = computed(() => {
   if (!guide.value?.content) return ''
   
-  // Reemplazar saltos de línea simples con dobles después de cada párrafo
-  let content = guide.value.content
-    .replace(/\n\n+/g, '\n\n')  // Normalizar múltiples saltos a dobles
-    .replace(/(^|\n)([^\n#].+)\n([^\n#])/g, '$1$2\n\n$3')  // Añadir espacio entre líneas
+  let html = guide.value.content
   
-  return marked(content)
+  // Títulos
+  html = html.replace(/^### (.*)$/gim, '<h3 class="text-xl font-bold mt-6 mb-3">$1</h3>')
+  html = html.replace(/^## (.*)$/gim, '<h2 class="text-2xl font-bold mt-8 mb-4">$1</h2>')
+  html = html.replace(/^# (.*)$/gim, '<h1 class="text-3xl font-bold mt-10 mb-5">$1</h1>')
+  
+  // Negrita e Itálica
+  html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+  html = html.replace(/\*(.+?)\*/g, '<em>$1</em>')
+  
+  // Enlaces
+  html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" class="text-primary-400 hover:underline" target="_blank">$1</a>')
+  
+  // Imágenes
+  html = html.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1" class="my-4 rounded-lg max-w-full">')
+  
+  // Listas
+  html = html.replace(/^\- (.+)$/gim, '<li class="ml-4">• $1</li>')
+  
+  // Párrafos (separar por doble salto de línea)
+  html = html.split('\n\n').map(p => {
+    p = p.trim()
+    if (!p) return ''
+    if (p.startsWith('<')) return p
+    return `<p class="mb-4">${p.replace(/\n/g, '<br>')}</p>`
+  }).join('')
+  
+  return html
 })
 
 const difficultyLabel = computed(() => {
