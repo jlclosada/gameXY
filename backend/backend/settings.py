@@ -5,8 +5,9 @@ import re
 import dj_database_url
 from dotenv import load_dotenv
 
-# Load environment variables
-load_dotenv()
+# Load environment variables (solo en desarrollo, Railway ya las provee)
+# override=False evita que .env sobrescriba las variables de Railway
+load_dotenv(override=False)
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
