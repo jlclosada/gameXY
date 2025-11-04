@@ -1,5 +1,24 @@
 from rest_framework import serializers
 from .models import Category, Game, GameRating
+import os
+
+class CloudinaryImageField(serializers.ImageField):
+    """Custom field to return proper Cloudinary URLs"""
+    
+    def to_representation(self, value):
+        if not value:
+            return None
+        
+        # Si estamos usando Cloudinary
+        if os.getenv('CLOUDINARY_URL') and hasattr(value, 'url'):
+            # Cloudinary ya devuelve la URL completa
+            return value.url
+        
+        # Fallback para desarrollo local
+        request = self.context.get('request')
+        if request is not None:
+            return request.build_absolute_uri(value.url)
+        return value.url
 
 class CategorySerializer(serializers.ModelSerializer):
     games_count = serializers.IntegerField(source='games.count', read_only=True)
@@ -11,6 +30,7 @@ class CategorySerializer(serializers.ModelSerializer):
 class GameListSerializer(serializers.ModelSerializer):
     categories = CategorySerializer(many=True, read_only=True)
     is_favorite = serializers.SerializerMethodField()
+    cover_image = CloudinaryImageField(read_only=True)
     
     class Meta:
         model = Game
@@ -32,6 +52,8 @@ class GameDetailSerializer(serializers.ModelSerializer):
         source='categories',
         required=False
     )
+    cover_image = CloudinaryImageField(required=False)
+    banner_image = CloudinaryImageField(required=False)
     ratings_count = serializers.IntegerField(source='ratings.count', read_only=True)
     created_by_username = serializers.CharField(source='created_by.username', read_only=True)
     user_rating = serializers.SerializerMethodField()
