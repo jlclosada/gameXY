@@ -19,44 +19,26 @@ def healthcheck(request):
         print(f"❌ [HEALTHCHECK] ERROR - {str(e)}", flush=True, file=sys.stderr)
         return JsonResponse({"status": "unhealthy", "error": str(e)}, status=503)
 
-def create_admin(request):
-    """Endpoint temporal para crear superuser. ELIMINAR después de usar."""
-    from django.contrib.auth import get_user_model
-    User = get_user_model()
+def cloudinary_check(request):
+    """Endpoint para verificar configuración de Cloudinary"""
+    from django.conf import settings
+    import os
     
-    # Verificar si ya existe
-    if User.objects.filter(username='admin').exists():
-        return JsonResponse({
-            "status": "exists",
-            "message": "Admin user already exists",
-            "login_url": "https://gamexy-production-9e2b.up.railway.app/admin/"
-        })
+    cloudinary_url = os.getenv('CLOUDINARY_URL')
+    default_storage = settings.DEFAULT_FILE_STORAGE if hasattr(settings, 'DEFAULT_FILE_STORAGE') else 'Not set'
     
-    # Crear superuser
-    try:
-        user = User.objects.create_superuser(
-            username='admin',
-            email='admin@gamexy.com',
-            password='Admin123456!'  # CAMBIAR DESPUÉS
-        )
-        return JsonResponse({
-            "status": "created",
-            "message": "Superuser created successfully",
-            "username": "admin",
-            "password": "Admin123456!",
-            "login_url": "https://gamexy-production-9e2b.up.railway.app/admin/",
-            "warning": "Change password immediately after login!"
-        })
-    except Exception as e:
-        return JsonResponse({
-            "status": "error",
-            "error": str(e)
-        }, status=500)
+    return JsonResponse({
+        "cloudinary_url_set": bool(cloudinary_url),
+        "cloudinary_url_preview": cloudinary_url[:30] + '...' if cloudinary_url else None,
+        "default_file_storage": default_storage,
+        "cloudinary_storage_set": hasattr(settings, 'CLOUDINARY_STORAGE'),
+    })
+
 
 urlpatterns = [
     path('health/', healthcheck, name='healthcheck'),
     path('health', healthcheck, name='healthcheck_no_slash'),  # Sin barra final también
-    path('create-admin-temp/', create_admin, name='create_admin'),  # TEMPORAL - ELIMINAR DESPUÉS
+    path('cloudinary-check/', cloudinary_check, name='cloudinary_check'),  # TEMPORAL
     path('admin/', admin.site.urls),
     path('api/auth/', include('users.urls')),
     path('api/games/', include('games.urls')),
