@@ -20,25 +20,37 @@ def healthcheck(request):
         print(f"❌ [HEALTHCHECK] ERROR - {str(e)}", flush=True, file=sys.stderr)
         return JsonResponse({"status": "unhealthy", "error": str(e)}, status=503)
 
-def cloudinary_check(request):
-    """Endpoint para verificar configuración de Cloudinary"""
+def media_check(request):
+    """Endpoint para verificar archivos media"""
     from django.conf import settings
     import os
     
-    cloudinary_url = os.getenv('CLOUDINARY_URL')
-    default_storage = settings.DEFAULT_FILE_STORAGE if hasattr(settings, 'DEFAULT_FILE_STORAGE') else 'Not set'
+    media_root = settings.MEDIA_ROOT
+    media_url = settings.MEDIA_URL
     
-    # Buscar todas las variables que contienen 'CLOUDINARY'
-    all_env_vars = {k: v[:30] + '...' if len(v) > 30 else v 
-                    for k, v in os.environ.items() 
-                    if 'CLOUDINARY' in k.upper()}
+    # Listar archivos en media
+    files = []
+    try:
+        if os.path.exists(media_root):
+            for root, dirs, filenames in os.walk(media_root):
+                for filename in filenames:
+                    filepath = os.path.join(root, filename)
+                    rel_path = os.path.relpath(filepath, media_root)
+                    files.append({
+                        'path': rel_path,
+                        'size': os.path.getsize(filepath),
+                        'exists': True
+                    })
+    except Exception as e:
+        files.append({'error': str(e)})
     
     return JsonResponse({
-        "cloudinary_url_set": bool(cloudinary_url),
-        "cloudinary_url_preview": cloudinary_url[:30] + '...' if cloudinary_url else None,
-        "default_file_storage": default_storage,
-        "cloudinary_storage_set": hasattr(settings, 'CLOUDINARY_STORAGE'),
-        "all_cloudinary_env_vars": all_env_vars,
+        "media_root": str(media_root),
+        "media_url": media_url,
+        "media_root_exists": os.path.exists(media_root),
+        "media_root_writable": os.access(media_root, os.W_OK) if os.path.exists(media_root) else False,
+        "files_count": len(files),
+        "files": files[:20],  # Mostrar solo los primeros 20
         "railway_environment": os.getenv('RAILWAY_ENVIRONMENT'),
     })
 
@@ -46,7 +58,7 @@ def cloudinary_check(request):
 urlpatterns = [
     path('health/', healthcheck, name='healthcheck'),
     path('health', healthcheck, name='healthcheck_no_slash'),  # Sin barra final también
-    path('cloudinary-check/', cloudinary_check, name='cloudinary_check'),  # TEMPORAL
+    path('media-check/', media_check, name='media_check'),  # TEMPORAL
     path('admin/', admin.site.urls),
     path('api/auth/', include('users.urls')),
     path('api/games/', include('games.urls')),
