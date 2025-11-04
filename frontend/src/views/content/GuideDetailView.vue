@@ -79,7 +79,7 @@
 
         <!-- Content -->
         <article class="card p-8 mb-8">
-          <div class="prose prose-invert prose-lg max-w-none" v-html="guide.content"></div>
+          <div class="prose prose-invert prose-lg max-w-none" v-html="renderedContent"></div>
         </article>
 
         <!-- Actions -->
@@ -156,6 +156,7 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter, RouterLink } from 'vue-router'
+import { marked } from 'marked'
 import { useAuthStore } from '@/stores/auth'
 import api from '@/api/axios'
 import CommentSection from '@/components/comments/CommentSection.vue'
@@ -165,6 +166,12 @@ const router = useRouter()
 const authStore = useAuthStore()
 const guide = ref(null)
 const loading = ref(true)
+
+// Computed property para renderizar el markdown
+const renderedContent = computed(() => {
+  if (!guide.value?.content) return ''
+  return marked(guide.value.content)
+})
 
 const difficultyLabel = computed(() => {
   const labels = {

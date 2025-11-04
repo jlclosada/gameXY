@@ -69,9 +69,7 @@
         <!-- Content -->
         <article class="card p-8 mb-8">
           <div class="prose prose-invert prose-lg max-w-none">
-            <div class="whitespace-pre-wrap leading-relaxed text-gray-300">
-              {{ news.content }}
-            </div>
+            <div v-html="renderedContent" class="leading-relaxed"></div>
           </div>
         </article>
 
@@ -106,14 +104,21 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRoute, RouterLink } from 'vue-router'
+import { marked } from 'marked'
 import api from '@/api/axios'
 import CommentSection from '@/components/comments/CommentSection.vue'
 
 const route = useRoute()
 const news = ref(null)
 const loading = ref(true)
+
+// Computed property para renderizar el markdown
+const renderedContent = computed(() => {
+  if (!news.value?.content) return ''
+  return marked(news.value.content)
+})
 
 function formatDate(date) {
   return new Date(date).toLocaleDateString('es-ES', {
