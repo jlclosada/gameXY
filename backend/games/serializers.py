@@ -2,21 +2,24 @@ from rest_framework import serializers
 from .models import Category, Game, GameRating
 import os
 
-class CloudinaryImageField(serializers.ImageField):
+class MediaImageField(serializers.ImageField):
     """Custom field to return proper image URLs with HTTPS in production"""
     
     def to_representation(self, value):
         if not value:
             return None
         
-        request = self.context.get('request')
-        if request is not None:
-            url = request.build_absolute_uri(value.url)
-            # Forzar HTTPS en producción
-            if os.getenv('RAILWAY_ENVIRONMENT') and url.startswith('http://'):
-                url = url.replace('http://', 'https://', 1)
-            return url
-        return value.url
+        try:
+            request = self.context.get('request')
+            if request is not None:
+                url = request.build_absolute_uri(value.url)
+                # Forzar HTTPS en producción
+                if os.getenv('RAILWAY_ENVIRONMENT') and url.startswith('http://'):
+                    url = url.replace('http://', 'https://', 1)
+                return url
+            return value.url
+        except:
+            return None
 
 class CategorySerializer(serializers.ModelSerializer):
     games_count = serializers.IntegerField(source='games.count', read_only=True)
@@ -28,7 +31,7 @@ class CategorySerializer(serializers.ModelSerializer):
 class GameListSerializer(serializers.ModelSerializer):
     categories = CategorySerializer(many=True, read_only=True)
     is_favorite = serializers.SerializerMethodField()
-    cover_image = CloudinaryImageField(read_only=True)
+    cover_image = MediaImageField(read_only=True)
     
     class Meta:
         model = Game
@@ -50,8 +53,8 @@ class GameDetailSerializer(serializers.ModelSerializer):
         source='categories',
         required=False
     )
-    cover_image = CloudinaryImageField(required=False)
-    banner_image = CloudinaryImageField(required=False)
+    cover_image = MediaImageField(required=False, allow_null=True)
+    banner_image = MediaImageField(required=False, allow_null=True)
     ratings_count = serializers.IntegerField(source='ratings.count', read_only=True)
     created_by_username = serializers.CharField(source='created_by.username', read_only=True)
     user_rating = serializers.SerializerMethodField()

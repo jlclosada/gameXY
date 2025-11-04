@@ -2,6 +2,7 @@ from rest_framework import viewsets, filters, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models import Avg
 from users.permissions import IsGoatOrReadOnly
@@ -20,6 +21,7 @@ class GameViewSet(viewsets.ModelViewSet):
     queryset = Game.objects.all()
     lookup_field = 'slug'
     permission_classes = [IsGoatOrReadOnly]
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = ['categories__slug', 'is_featured', 'genre', 'multiplayer']
     search_fields = ['title', 'description', 'developer', 'publisher']
