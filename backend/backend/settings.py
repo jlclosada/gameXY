@@ -66,13 +66,13 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 
 # Database Configuration
 # Usar PostgreSQL en producción, SQLite en desarrollo
-if os.getenv('DATABASE_URL'):
-    # Producción con PostgreSQL
+database_url = os.getenv('DATABASE_URL') or os.getenv('DATABASE_PUBLIC_URL')
+
+if database_url:
     DATABASES = {
-        'default': dj_database_url.parse(os.getenv('DATABASE_URL'), conn_max_age=600)
+        'default': dj_database_url.parse(database_url, conn_max_age=600)
     }
 else:
-    # Desarrollo con SQLite
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
