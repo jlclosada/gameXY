@@ -167,6 +167,12 @@ const authStore = useAuthStore()
 const guide = ref(null)
 const loading = ref(true)
 
+// Configurar marked para respetar saltos de línea
+marked.setOptions({
+  breaks: true,  // Convierte \n en <br>
+  gfm: true      // GitHub Flavored Markdown
+})
+
 // Computed property para renderizar el markdown
 const renderedContent = computed(() => {
   if (!guide.value?.content) return ''
