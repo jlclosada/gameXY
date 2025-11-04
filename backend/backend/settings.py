@@ -3,11 +3,11 @@ from datetime import timedelta
 import os
 import re
 import dj_database_url
-from dotenv import load_dotenv
 
-# Load environment variables (solo en desarrollo, Railway ya las provee)
-# override=False evita que .env sobrescriba las variables de Railway
-load_dotenv(override=False)
+# Load environment variables solo en desarrollo (no en Railway)
+if not os.getenv('RAILWAY_ENVIRONMENT'):
+    from dotenv import load_dotenv
+    load_dotenv()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
