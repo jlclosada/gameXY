@@ -67,12 +67,23 @@ urlpatterns = [
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 ]
 
+# Crear vista personalizada para servir media con logging
+def serve_media(request, path):
+    """Vista personalizada para servir archivos media con logging"""
+    import os
+    full_path = os.path.join(settings.MEDIA_ROOT, path)
+    print(f"[MEDIA] Requested: {path}", flush=True)
+    print(f"[MEDIA] Full path: {full_path}", flush=True)
+    print(f"[MEDIA] Exists: {os.path.exists(full_path)}", flush=True)
+    print(f"[MEDIA] MEDIA_ROOT: {settings.MEDIA_ROOT}", flush=True)
+    return serve(request, path, document_root=settings.MEDIA_ROOT)
+
 # Servir archivos media
 if settings.DEBUG:
     # En desarrollo, usar el helper estándar
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 else:
-    # En producción, servir explícitamente con django.views.static.serve
+    # En producción, servir explícitamente con vista personalizada
     urlpatterns += [
-        re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),
+        re_path(r'^media/(?P<path>.*)$', serve_media),
     ]
