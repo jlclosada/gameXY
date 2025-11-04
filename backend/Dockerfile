@@ -29,7 +29,7 @@ RUN python manage.py collectstatic --noinput || true
 # Expón el puerto (Railway usa la variable $PORT) ok
 EXPOSE 8000
 
-# Ejecuta migraciones y arranca Gunicorn con logs visibles goooooo
+# Ejecuta migraciones y arranca Gunicorn con logs visibles goooooo©©©
 CMD echo "🚀 Iniciando despliegue..." && \
     echo "🔹 Variables de entorno detectadas:" && \
     echo "PORT=${PORT}" && \
