@@ -172,12 +172,7 @@ const renderedContent = computed(() => {
   
   let html = guide.value.content
   
-  // Títulos
-  html = html.replace(/^### (.*)$/gim, '<h3 class="text-xl font-bold mt-6 mb-3">$1</h3>')
-  html = html.replace(/^## (.*)$/gim, '<h2 class="text-2xl font-bold mt-8 mb-4">$1</h2>')
-  html = html.replace(/^# (.*)$/gim, '<h1 class="text-3xl font-bold mt-10 mb-5">$1</h1>')
-  
-  // Negrita e Itálica
+  // Primero procesar negrita e itálica (inline)
   html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
   html = html.replace(/\*(.+?)\*/g, '<em>$1</em>')
   
@@ -186,6 +181,11 @@ const renderedContent = computed(() => {
   
   // Imágenes
   html = html.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1" class="my-4 rounded-lg max-w-full">')
+  
+  // Títulos (antes de dividir en párrafos)
+  html = html.replace(/^### (.*)$/gim, '\n<h3 class="text-xl font-bold mt-6 mb-3">$1</h3>\n')
+  html = html.replace(/^## (.*)$/gim, '\n<h2 class="text-2xl font-bold mt-8 mb-4">$1</h2>\n')
+  html = html.replace(/^# (.*)$/gim, '\n<h1 class="text-3xl font-bold mt-10 mb-5">$1</h1>\n')
   
   // Listas
   html = html.replace(/^\- (.+)$/gim, '<li class="ml-4">• $1</li>')
