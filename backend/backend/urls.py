@@ -5,13 +5,14 @@ from django.conf.urls.static import static
 from rest_framework_simplejwt.views import TokenRefreshView
 from django.http import JsonResponse
 
+import sys
 
 def healthcheck(request):
+    print("🩺 [HEALTHCHECK] Endpoint llamado correctamente ✅", flush=True)
     return JsonResponse({"status": "ok"})
 
-
 urlpatterns = [
-    path('health/', healthcheck),
+    path('health/', healthcheck),  # 👈 el endpoint para Railway
     path('admin/', admin.site.urls),
     path('api/auth/', include('users.urls')),
     path('api/games/', include('games.urls')),
