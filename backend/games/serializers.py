@@ -3,21 +3,19 @@ from .models import Category, Game, GameRating
 import os
 
 class CloudinaryImageField(serializers.ImageField):
-    """Custom field to return proper Cloudinary URLs"""
+    """Custom field to return proper image URLs with HTTPS in production"""
     
     def to_representation(self, value):
         if not value:
             return None
         
-        # Si estamos usando Cloudinary
-        if os.getenv('CLOUDINARY_URL') and hasattr(value, 'url'):
-            # Cloudinary ya devuelve la URL completa
-            return value.url
-        
-        # Fallback para desarrollo local
         request = self.context.get('request')
         if request is not None:
-            return request.build_absolute_uri(value.url)
+            url = request.build_absolute_uri(value.url)
+            # Forzar HTTPS en producción
+            if os.getenv('RAILWAY_ENVIRONMENT') and url.startswith('http://'):
+                url = url.replace('http://', 'https://', 1)
+            return url
         return value.url
 
 class CategorySerializer(serializers.ModelSerializer):
