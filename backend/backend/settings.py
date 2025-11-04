@@ -1,6 +1,7 @@
 from pathlib import Path
 from datetime import timedelta
 import os
+import re
 import dj_database_url
 from dotenv import load_dotenv
 
@@ -150,18 +151,34 @@ SIMPLE_JWT = {
 }
 
 # CORS Settings
-CORS_ALLOWED_ORIGINS = os.getenv(
+# Permitir origenes específicos
+cors_origins_env = os.getenv(
     'CORS_ALLOWED_ORIGINS',
     'http://localhost:5173,http://127.0.0.1:5173'
-).split(',')
+)
+CORS_ALLOWED_ORIGINS = [origin.strip() for origin in cors_origins_env.split(',') if origin.strip()]
+
+# Permitir todos los subdominios de Vercel para preview deployments
+CORS_ALLOWED_ORIGIN_REGEXES = [
+    r"^https://.*\.vercel\.app$",  # Cualquier subdominio de vercel.app
+]
 
 CORS_ALLOW_CREDENTIALS = True
 
 # CSRF Trusted Origins (para admin y formularios en producción)
-CSRF_TRUSTED_ORIGINS = os.getenv(
+csrf_origins_env = os.getenv(
     'CSRF_TRUSTED_ORIGINS',
     'http://localhost:5173,http://127.0.0.1:5173'
-).split(',')
+)
+CSRF_TRUSTED_ORIGINS = [origin.strip() for origin in csrf_origins_env.split(',') if origin.strip()]
+
+# Añadir también subdominios de Vercel dinámicamente si es necesario
+if os.getenv('RAILWAY_ENVIRONMENT'):
+    # En producción, permitir cualquier subdominio de vercel.app para CSRF
+    CSRF_TRUSTED_ORIGINS.extend([
+        'https://game-xy.vercel.app',
+        'https://*.vercel.app',  # Django 4.0+ soporta wildcards en CSRF
+    ])
 
 # Security Settings for Production
 if not DEBUG:
