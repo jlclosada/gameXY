@@ -157,6 +157,12 @@ CORS_ALLOWED_ORIGINS = os.getenv(
 
 CORS_ALLOW_CREDENTIALS = True
 
+# CSRF Trusted Origins (para admin y formularios en producción)
+CSRF_TRUSTED_ORIGINS = os.getenv(
+    'CSRF_TRUSTED_ORIGINS',
+    'http://localhost:5173,http://127.0.0.1:5173'
+).split(',')
+
 # Security Settings for Production
 if not DEBUG:
     # No forzar SSL redirect en Railway (usa su proxy)
