@@ -120,32 +120,16 @@ STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-# Cloudinary Configuration
-if os.getenv('CLOUDINARY_URL'):
-    # Usar Cloudinary en producción
-    import cloudinary
-    
-    # Parsear la URL de Cloudinary
-    cloudinary_url = os.getenv('CLOUDINARY_URL')
-    
-    # Configurar Cloudinary
-    cloudinary.config(
-        cloudinary_url=cloudinary_url,
-        secure=True
-    )
-    
-    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-    
-    # Cloudinary URLs
-    CLOUDINARY_STORAGE = {
-        'CLOUD_NAME': cloudinary.config().cloud_name,
-        'API_KEY': cloudinary.config().api_key,
-        'API_SECRET': cloudinary.config().api_secret
-    }
-else:
-    # Usar almacenamiento local en desarrollo
+# Media files configuration
+# Usar Railway Volume en producción o local en desarrollo
+if os.getenv('RAILWAY_ENVIRONMENT'):
+    # En producción, usar el volumen montado en /app/media
+    MEDIA_ROOT = '/app/media'
     MEDIA_URL = '/media/'
+else:
+    # En desarrollo local
     MEDIA_ROOT = BASE_DIR / 'media'
+    MEDIA_URL = '/media/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 

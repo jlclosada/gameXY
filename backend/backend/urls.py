@@ -6,6 +6,7 @@ from rest_framework_simplejwt.views import TokenRefreshView
 from django.http import JsonResponse
 
 import sys
+import os
 
 def healthcheck(request):
     """Healthcheck endpoint para Railway y otros servicios de deployment."""
@@ -53,5 +54,6 @@ urlpatterns = [
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 ]
 
-if settings.DEBUG:
+# Servir archivos media (desarrollo y producción con Railway Volume)
+if settings.DEBUG or os.getenv('RAILWAY_ENVIRONMENT'):
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
