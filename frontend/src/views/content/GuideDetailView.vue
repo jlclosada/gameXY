@@ -167,16 +167,22 @@ const authStore = useAuthStore()
 const guide = ref(null)
 const loading = ref(true)
 
-// Configurar marked para respetar saltos de línea
+// Configurar marked
 marked.setOptions({
-  breaks: true,  // Convierte \n en <br>
-  gfm: true      // GitHub Flavored Markdown
+  breaks: true,   // Convertir \n en <br>
+  gfm: true       // GitHub Flavored Markdown
 })
 
 // Computed property para renderizar el markdown
 const renderedContent = computed(() => {
   if (!guide.value?.content) return ''
-  return marked(guide.value.content)
+  
+  // Reemplazar saltos de línea simples con dobles después de cada párrafo
+  let content = guide.value.content
+    .replace(/\n\n+/g, '\n\n')  // Normalizar múltiples saltos a dobles
+    .replace(/(^|\n)([^\n#].+)\n([^\n#])/g, '$1$2\n\n$3')  // Añadir espacio entre líneas
+  
+  return marked(content)
 })
 
 const difficultyLabel = computed(() => {

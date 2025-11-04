@@ -114,16 +114,23 @@ const route = useRoute()
 const news = ref(null)
 const loading = ref(true)
 
-// Configurar marked para respetar saltos de línea
+// Configurar marked
 marked.setOptions({
-  breaks: true,  // Convierte \n en <br>
-  gfm: true      // GitHub Flavored Markdown
+  breaks: true,   // Convertir \n en <br>
+  gfm: true       // GitHub Flavored Markdown
 })
 
 // Computed property para renderizar el markdown
 const renderedContent = computed(() => {
   if (!news.value?.content) return ''
-  return marked(news.value.content)
+  
+  // Reemplazar saltos de línea simples con dobles después de cada párrafo
+  // pero manteniendo los títulos y espacios existentes
+  let content = news.value.content
+    .replace(/\n\n+/g, '\n\n')  // Normalizar múltiples saltos a dobles
+    .replace(/(^|\n)([^\n#].+)\n([^\n#])/g, '$1$2\n\n$3')  // Añadir espacio entre líneas de texto
+  
+  return marked(content)
 })
 
 function formatDate(date) {

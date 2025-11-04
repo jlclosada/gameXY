@@ -119,10 +119,10 @@ import { useRouter, useRoute } from 'vue-router'
 import { marked } from 'marked'
 import api from '@/api/axios'
 
-// Configurar marked para respetar saltos de línea
+// Configurar marked
 marked.setOptions({
-  breaks: true,  // Convierte \n en <br>
-  gfm: true      // GitHub Flavored Markdown
+  breaks: true,   // Convertir \n en <br>
+  gfm: true       // GitHub Flavored Markdown
 })
 
 const router = useRouter()
@@ -160,7 +160,13 @@ watch(() => form.value.title, (newTitle) => {
 // Renderizado de Markdown usando marked (igual que en la vista de detalle)
 const renderedContent = computed(() => {
   if (!form.value.content) return ''
-  return marked(form.value.content)
+  
+  // Reemplazar saltos de línea simples con dobles después de cada párrafo
+  let content = form.value.content
+    .replace(/\n\n+/g, '\n\n')  // Normalizar múltiples saltos a dobles
+    .replace(/(^|\n)([^\n#].+)\n([^\n#])/g, '$1$2\n\n$3')  // Añadir espacio entre líneas
+  
+  return marked(content)
 })
 
 function handleFileChange(event) {
