@@ -3,55 +3,8 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex justify-between items-center h-14">
         <!-- Logo -->
-        <RouterLink to="/" class="flex items-center space-x-3 group">
-          <!-- Logo XY cruzado con efecto neón -->
-          <div class="relative w-10 h-10 group-hover:scale-110 transition-transform duration-300">
-            <svg viewBox="0 0 100 100" class="w-full h-full">
-              <defs>
-                <!-- Gradiente principal -->
-                <linearGradient id="logo-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" style="stop-color:#8b5cf6;stop-opacity:1" />
-                  <stop offset="50%" style="stop-color:#ec4899;stop-opacity:1" />
-                  <stop offset="100%" style="stop-color:#06b6d4;stop-opacity:1" />
-                </linearGradient>
-                <!-- Filtro de resplandor -->
-                <filter id="glow">
-                  <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
-                  <feMerge>
-                    <feMergeNode in="coloredBlur"/>
-                    <feMergeNode in="SourceGraphic"/>
-                  </feMerge>
-                </filter>
-              </defs>
-              
-              <!-- X cruzada -->
-              <path 
-                d="M 15 20 L 45 80 M 45 20 L 15 80" 
-                stroke="url(#logo-gradient)" 
-                stroke-width="8" 
-                stroke-linecap="round" 
-                stroke-linejoin="round"
-                fill="none"
-                filter="url(#glow)"
-                class="group-hover:animate-pulse"
-              />
-              
-              <!-- Y cruzada -->
-              <path 
-                d="M 55 20 L 70 45 L 85 20 M 70 45 L 70 80" 
-                stroke="url(#logo-gradient)" 
-                stroke-width="8" 
-                stroke-linecap="round" 
-                stroke-linejoin="round"
-                fill="none"
-                filter="url(#glow)"
-                class="group-hover:animate-pulse"
-              />
-            </svg>
-            <!-- Resplandor adicional en hover -->
-            <div class="absolute inset-0 bg-gradient-to-br from-primary-500/0 to-accent-500/0 group-hover:from-primary-500/20 group-hover:to-accent-500/20 rounded-lg blur-xl transition-all duration-300"></div>
-          </div>
-          <span class="text-lg font-display font-bold">
+        <RouterLink to="/" class="group">
+          <span class="text-xl font-display font-bold">
             <span class="text-white">Game</span><span class="bg-gradient-to-r from-primary-400 to-accent-400 bg-clip-text text-transparent">XY</span>
           </span>
         </RouterLink>
