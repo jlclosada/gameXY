@@ -17,11 +17,11 @@
     </div>
 
     <div v-else-if="game">
-      <!-- Hero Banner con Parallax -->
+      <!-- Hero Banner -->
       <div class="relative h-[400px] md:h-[500px] overflow-hidden">
         <div 
           v-if="game.banner_image" 
-          class="absolute inset-0 bg-cover bg-center bg-fixed"
+          class="absolute inset-0 bg-cover bg-center transform scale-105"
           :style="{ backgroundImage: `url(${game.banner_image})` }"
         >
           <div class="absolute inset-0 bg-gradient-to-b from-dark-950/60 via-dark-950/80 to-dark-950"></div>

@@ -10,11 +10,11 @@
     </div>
 
     <div v-else-if="news">
-      <!-- Hero Section con Parallax -->
+      <!-- Hero Section -->
       <div class="relative h-[400px] md:h-[500px] overflow-hidden">
         <div 
           v-if="news.featured_image" 
-          class="absolute inset-0 bg-cover bg-center bg-fixed"
+          class="absolute inset-0 bg-cover bg-center transform scale-105"
           :style="{ backgroundImage: `url(${news.featured_image})` }"
         >
           <div class="absolute inset-0 bg-gradient-to-b from-dark-950/40 via-dark-950/70 to-dark-950"></div>
