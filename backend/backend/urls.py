@@ -27,11 +27,18 @@ def cloudinary_check(request):
     cloudinary_url = os.getenv('CLOUDINARY_URL')
     default_storage = settings.DEFAULT_FILE_STORAGE if hasattr(settings, 'DEFAULT_FILE_STORAGE') else 'Not set'
     
+    # Buscar todas las variables que contienen 'CLOUDINARY'
+    all_env_vars = {k: v[:30] + '...' if len(v) > 30 else v 
+                    for k, v in os.environ.items() 
+                    if 'CLOUDINARY' in k.upper()}
+    
     return JsonResponse({
         "cloudinary_url_set": bool(cloudinary_url),
         "cloudinary_url_preview": cloudinary_url[:30] + '...' if cloudinary_url else None,
         "default_file_storage": default_storage,
         "cloudinary_storage_set": hasattr(settings, 'CLOUDINARY_STORAGE'),
+        "all_cloudinary_env_vars": all_env_vars,
+        "railway_environment": os.getenv('RAILWAY_ENVIRONMENT'),
     })
 
 
