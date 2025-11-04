@@ -3,7 +3,7 @@ builder = "DOCKERFILE"
 watchPatterns = ["**/*.py", "requirements.txt"]
 
 [deploy]
-healthcheckPath = "/health/"
+healthcheckPath = "/health"
 healthcheckTimeout = 300
 restartPolicyType = "ON_FAILURE"
 restartPolicyMaxRetries = 10

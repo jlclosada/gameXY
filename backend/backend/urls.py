@@ -20,7 +20,8 @@ def healthcheck(request):
         return JsonResponse({"status": "unhealthy", "error": str(e)}, status=503)
 
 urlpatterns = [
-    path('health/', healthcheck),  # 👈 el endpoint para Railway
+    path('health/', healthcheck, name='healthcheck'),
+    path('health', healthcheck, name='healthcheck_no_slash'),  # Sin barra final también
     path('admin/', admin.site.urls),
     path('api/auth/', include('users.urls')),
     path('api/games/', include('games.urls')),
