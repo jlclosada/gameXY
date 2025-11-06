@@ -1,6 +1,24 @@
 from django.db import models
 from django.conf import settings
 
+class Genre(models.Model):
+    """Géneros de videojuegos"""
+    name = models.CharField(max_length=100, unique=True, help_text='Nombre del género')
+    slug = models.SlugField(unique=True)
+    icon = models.CharField(max_length=50, default='🎮', help_text='Emoji o icono para el género')
+    description = models.TextField(blank=True)
+    order = models.IntegerField(default=0, help_text='Orden de visualización')
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        ordering = ['order', 'name']
+        verbose_name = 'Género'
+        verbose_name_plural = 'Géneros'
+
 class Category(models.Model):
     name = models.CharField(max_length=100, unique=True)
     slug = models.SlugField(unique=True)

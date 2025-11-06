@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Category, Game, GameRating
+from .models import Category, Game, GameRating, Genre
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
@@ -17,3 +17,9 @@ class GameAdmin(admin.ModelAdmin):
 class GameRatingAdmin(admin.ModelAdmin):
     list_display = ['game', 'user', 'rating', 'created_at']
     list_filter = ['rating', 'created_at']
+
+
+@admin.register(Genre)
+class GenreAdmin(admin.ModelAdmin):
+    list_display = ['name', 'is_active']
+    list_filter = ['name']
