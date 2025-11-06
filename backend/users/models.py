@@ -10,13 +10,34 @@ class User(AbstractUser):
         ('admin', 'Administrador'),
     ]
     
+    GENDER_CHOICES = [
+        ('male', 'Masculino'),
+        ('female', 'Femenino'),
+        ('other', 'Otro'),
+        ('prefer_not_to_say', 'Prefiero no decir'),
+    ]
+    
+    # Override username para permitir null inicialmente
+    username = models.CharField(max_length=150, unique=True, null=True, blank=True)
     email = models.EmailField(unique=True)
+    
+    # Email es el campo principal para autenticación
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['username']  # username se pedirá en el perfil, no en registro
+    first_name = models.CharField(max_length=150, blank=True)
+    last_name = models.CharField(max_length=150, blank=True)
+    birth_date = models.DateField(null=True, blank=True)
+    gender = models.CharField(max_length=20, choices=GENDER_CHOICES, blank=True)
     bio = models.TextField(blank=True, max_length=500)
     avatar = models.ImageField(upload_to='avatars/', null=True, blank=True)
     role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='user')
     favorite_games = models.ManyToManyField('games.Game', related_name='favorited_by', blank=True)
+    favorite_genres = models.JSONField(default=list, blank=True, help_text='Lista de géneros favoritos del usuario')
     following_categories = models.ManyToManyField('games.Category', related_name='followers', blank=True)
     saved_guides = models.ManyToManyField('content.Guide', related_name='saved_by', blank=True)
+    country = models.CharField(max_length=100, blank=True)
+    city = models.CharField(max_length=100, blank=True)
+    profile_completed = models.BooleanField(default=False, help_text='Indica si el usuario completó su perfil inicial')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

@@ -6,9 +6,16 @@ from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models import Avg
 from users.permissions import IsGoatOrReadOnly
-from .models import Category, Game, GameRating
-from .serializers import (CategorySerializer, GameListSerializer, 
+from .models import Genre, Category, Game, GameRating
+from .serializers import (GenreSerializer, CategorySerializer, GameListSerializer, 
                           GameDetailSerializer, GameRatingSerializer)
+
+class GenreViewSet(viewsets.ReadOnlyModelViewSet):
+    """API endpoint para géneros de videojuegos"""
+    queryset = Genre.objects.filter(is_active=True)
+    serializer_class = GenreSerializer
+    lookup_field = 'slug'
+    pagination_class = None  # Sin paginación para lista completa
 
 class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Category.objects.all()

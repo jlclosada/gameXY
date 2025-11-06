@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Category, Game, GameRating
+from .models import Genre, Category, Game, GameRating
 import os
 
 class MediaImageField(serializers.ImageField):
@@ -20,6 +20,11 @@ class MediaImageField(serializers.ImageField):
             return value.url
         except:
             return None
+
+class GenreSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Genre
+        fields = ['id', 'name', 'slug', 'icon', 'description', 'order']
 
 class CategorySerializer(serializers.ModelSerializer):
     games_count = serializers.IntegerField(source='games.count', read_only=True)

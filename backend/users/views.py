@@ -18,7 +18,7 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     
     def get_permissions(self):
-        if self.action in ['create', 'list']:
+        if self.action in ['create', 'list', 'complete_profile']:
             return [AllowAny()]
         return [IsAuthenticated()]
     
@@ -71,6 +71,57 @@ class UserViewSet(viewsets.ModelViewSet):
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    @action(detail=False, methods=['post'], permission_classes=[AllowAny])
+    def complete_profile(self, request):
+        """Completar información adicional del perfil tras el registro y hacer login"""
+        from rest_framework_simplejwt.tokens import RefreshToken
+        from django.contrib.auth import authenticate
+        
+        # Obtener credenciales
+        email = request.data.get('email')
+        password = request.data.get('password')
+        
+        if not email or not password:
+            return Response(
+                {'error': 'Email y contraseña son requeridos'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Autenticar usuario
+        user = authenticate(username=email, password=password)
+        if not user:
+            return Response(
+                {'error': 'Credenciales inválidas'},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+        
+        # Validar que el username no esté en uso
+        new_username = request.data.get('username')
+        if new_username:
+            if User.objects.filter(username=new_username).exclude(id=user.id).exists():
+                return Response(
+                    {'error': 'Este nombre de usuario ya está en uso'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+        
+        # Actualizar perfil
+        serializer = UserSerializer(user, data=request.data, partial=True)
+        
+        if serializer.is_valid():
+            # Marcar perfil como completado
+            serializer.save(profile_completed=True)
+            
+            # Generar tokens
+            refresh = RefreshToken.for_user(user)
+            
+            return Response({
+                'refresh': str(refresh),
+                'access': str(refresh.access_token),
+                'user': serializer.data,
+                'message': 'Perfil completado exitosamente'
+            })
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
     @action(detail=False, methods=['post'], permission_classes=[IsAuthenticated])
