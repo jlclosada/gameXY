@@ -620,8 +620,9 @@ async function handleCompleteProfile() {
         'Content-Type': 'multipart/form-data'
       }
     })
-    
+
     // El backend devolverá tokens y datos del usuario
+    //otrooo
     if (response.data.access) {
       localStorage.setItem('access_token', response.data.access)
       localStorage.setItem('refresh_token', response.data.refresh)
