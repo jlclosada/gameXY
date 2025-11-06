@@ -20,6 +20,12 @@ const routes = [
     meta: { guest: true }
   },
   {
+    path: '/complete-profile',
+    name: 'complete-profile',
+    component: () => import('@/views/auth/ProfileCompleteView.vue'),
+    meta: { requiresAuth: false }
+  },
+  {
     path: '/games',
     name: 'games',
     component: () => import('@/views/games/GamesView.vue')

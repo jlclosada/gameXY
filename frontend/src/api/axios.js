@@ -28,19 +28,19 @@ api.interceptors.response.use(
   response => response,
   async error => {
     const originalRequest = error.config
-    
+
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true
-      
+
       try {
         const refreshToken = localStorage.getItem('refresh_token')
         const response = await axios.post(`${apiURL}/api/token/refresh/`, {
           refresh: refreshToken
         })
-        
+
         const { access } = response.data
         localStorage.setItem('access_token', access)
-        
+
         originalRequest.headers.Authorization = `Bearer ${access}`
         return api(originalRequest)
       } catch (err) {
@@ -50,7 +50,7 @@ api.interceptors.response.use(
         return Promise.reject(err)
       }
     }
-    
+
     return Promise.reject(error)
   }
 )
