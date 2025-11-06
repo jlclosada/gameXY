@@ -9,13 +9,13 @@ export const useAuthStore = defineStore('auth', () => {
 
   const isAuthenticated = computed(() => !!user.value)
 
-  async function login(username, password) {
+  async function login(email, password) {
     loading.value = true
     error.value = null
     
     try {
       const response = await api.post('/auth/login/', {
-        username,
+        email,
         password
       })
       
@@ -39,11 +39,14 @@ export const useAuthStore = defineStore('auth', () => {
     error.value = null
     
     try {
-      await api.post('/auth/users/', userData)
-      return await login(userData.username, userData.password)
+      const response = await api.post('/auth/users/', userData)
+      // Guardar temporalmente las credenciales para login después de completar perfil
+      sessionStorage.setItem('pendingEmail', userData.email)
+      sessionStorage.setItem('pendingPassword', userData.password)
+      return { success: true, userId: response.data.id }
     } catch (err) {
       error.value = err.response?.data || 'Error al registrarse'
-      return false
+      return { success: false }
     } finally {
       loading.value = false
     }

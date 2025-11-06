@@ -13,7 +13,7 @@
         <div class="hidden md:block flex-1 max-w-md mx-4">
           <GlobalSearch />
         </div>
-        
+
         <!-- Navigation Links -->
         <div class="hidden md:flex items-center space-x-1">
           <RouterLink to="/games" class="px-3 py-2 text-sm font-medium text-gray-400 hover:text-white hover:bg-dark-850 rounded-lg transition">
@@ -37,7 +37,7 @@
             <NotificationBell />
             <!-- User Dropdown -->
             <div class="relative" ref="dropdownRef">
-              <button 
+              <button
                 @click="showDropdown = !showDropdown"
                 class="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-400 hover:text-white hover:bg-dark-850 rounded-lg transition group"
               >
@@ -55,14 +55,14 @@
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                 </svg>
               </button>
-              
+
               <!-- Dropdown Menu -->
-              <div 
+              <div
                 v-if="showDropdown"
                 class="absolute right-0 mt-2 w-56 bg-dark-850 border border-dark-700 rounded-lg shadow-xl py-2 z-50"
               >
-                <RouterLink 
-                  to="/profile" 
+                <RouterLink
+                  to="/profile"
                   @click="showDropdown = false"
                   class="flex items-center gap-3 px-4 py-2 text-sm text-gray-300 hover:bg-dark-800 hover:text-white transition"
                 >
@@ -71,9 +71,9 @@
                   </svg>
                   Mi Perfil
                 </RouterLink>
-                
-                <RouterLink 
-                  to="/saved-guides" 
+
+                <RouterLink
+                  to="/saved-guides"
                   @click="showDropdown = false"
                   class="flex items-center gap-3 px-4 py-2 text-sm text-gray-300 hover:bg-dark-800 hover:text-white transition"
                 >
@@ -82,9 +82,9 @@
                   </svg>
                   Guías Guardadas
                 </RouterLink>
-                
-                <RouterLink 
-                  to="/favorite-games" 
+
+                <RouterLink
+                  to="/favorite-games"
                   @click="showDropdown = false"
                   class="flex items-center gap-3 px-4 py-2 text-sm text-gray-300 hover:bg-dark-800 hover:text-white transition"
                 >
@@ -93,21 +93,21 @@
                   </svg>
                   Mis Juegos Favoritos
                 </RouterLink>
-                
-                <RouterLink 
-                  to="/achievements" 
+
+                <RouterLink
+                  to="/achievements"
                   @click="showDropdown = false"
                   class="flex items-center gap-3 px-4 py-2 text-sm text-gray-300 hover:bg-dark-800 hover:text-white transition"
                 >
                   <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/>
                   </svg>
-                  🏆 Mis Logros
+                  Mis Logros
                 </RouterLink>
-                
+
                 <div class="border-t border-dark-700 my-2"></div>
-                
-                <button 
+
+                <button
                   @click="handleLogout"
                   class="flex items-center gap-3 px-4 py-2 text-sm text-red-400 hover:bg-dark-800 hover:text-red-300 transition w-full text-left"
                 >
