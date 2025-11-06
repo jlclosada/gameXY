@@ -132,7 +132,8 @@ else:
 if os.getenv('RAILWAY_ENVIRONMENT'):
     # En producción, usar el volumen montado en /app/media
     MEDIA_ROOT = '/app/media'
-    MEDIA_URL = '/media/'
+    # Forzar HTTPS para las URLs de media en producción
+    MEDIA_URL = 'https://gamexy-production-9e2b.up.railway.app/media/'
     # Crear el directorio si no existe
     os.makedirs(MEDIA_ROOT, exist_ok=True)
 else:
