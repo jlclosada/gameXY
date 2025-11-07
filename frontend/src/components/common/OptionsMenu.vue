@@ -99,9 +99,8 @@
               </div>
             </button>
 
-            <RouterLink
-              to="/games/new"
-              @click="closeMenu"
+            <button
+              @click="createGame"
               class="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-dark-700 rounded-lg transition group"
             >
               <svg class="w-5 h-5 text-green-400 group-hover:text-green-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -111,7 +110,7 @@
                 <div class="font-medium">Añadir Juego</div>
                 <div class="text-xs text-dark-400">Crear nuevo juego</div>
               </div>
-            </RouterLink>
+            </button>
 
             <RouterLink
               to="/news/new"
@@ -270,5 +269,11 @@ function editNews(news) {
   showNewsSearch.value = false
   closeMenu()
   router.push(`/news/${news.slug}/edit`)
+}
+
+function createGame() {
+  console.log('Navigating to /games/new')
+  closeMenu()
+  router.push('/games/new')
 }
 </script>
