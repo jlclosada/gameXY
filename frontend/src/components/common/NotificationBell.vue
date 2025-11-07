@@ -135,7 +135,13 @@ const getNotificationIcon = (type) => {
     'achievement': '🏆',
     'new_guide_favorite_game': '📖',
     'new_follower': '👤',
-    'system': '🔔'
+    'system': '🔔',
+    'post_reply': '📝',
+    'group_post_comment': '💬',
+    'join_request': '🚪',
+    'join_approved': '✅',
+    'join_rejected': '❌',
+    'group_post': '📢'
   }
   return icons[type] || '🔔'
 }
@@ -193,8 +199,13 @@ const handleNotificationClick = async (notification) => {
     }
   }
 
-  // Navegar
-  if (notification.action_url) {
+  // Para join requests, emitir evento para mostrar modal
+  if (notification.type === 'join_request' && notification.metadata) {
+    showNotifications.value = false
+    // Emitir evento global o navegar
+    router.push(notification.action_url)
+  } else if (notification.action_url) {
+    // Navegar para otros tipos
     showNotifications.value = false
     router.push(notification.action_url)
   }

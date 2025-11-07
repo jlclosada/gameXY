@@ -25,7 +25,7 @@
           <RouterLink to="/guides" class="px-3 py-2 text-sm font-medium text-gray-400 hover:text-white hover:bg-dark-850 rounded-lg transition">
             Guías
           </RouterLink>
-          <RouterLink to="/posts" class="px-3 py-2 text-sm font-medium text-gray-400 hover:text-white hover:bg-dark-850 rounded-lg transition">
+          <RouterLink to="/community" class="px-3 py-2 text-sm font-medium text-gray-400 hover:text-white hover:bg-dark-850 rounded-lg transition">
             Comunidad
           </RouterLink>
         </div>

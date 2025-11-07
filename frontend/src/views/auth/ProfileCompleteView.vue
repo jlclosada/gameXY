@@ -88,14 +88,13 @@
                 <label for="birth_date" class="block text-sm font-medium mb-2">
                   Fecha de Nacimiento <span class="text-red-400">*</span>
                 </label>
-                <input
-                  id="birth_date"
+                <DatePicker
                   v-model="form.birth_date"
-                  type="date"
-                  required
-                  :max="maxDate"
-                  class="input cursor-pointer"
-                >
+                  placeholder="Selecciona tu fecha de nacimiento"
+                  :max-date="maxDate"
+                  :year-range="[1940, new Date().getFullYear() - 13]"
+                  :required="true"
+                />
                 <p v-if="calculatedAge" class="text-xs text-dark-400 mt-1">
                   Edad: {{ calculatedAge }} años
                 </p>
@@ -360,6 +359,7 @@ import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import api from '@/api/axios'
 import axios from 'axios'
+import DatePicker from '@/components/common/DatePicker.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()

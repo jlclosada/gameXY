@@ -31,6 +31,18 @@ const routes = [
     component: () => import('@/views/games/GamesView.vue')
   },
   {
+    path: '/games/new',
+    name: 'game-create',
+    component: () => import('@/views/games/GameFormView.vue'),
+    meta: { requiresAuth: true, requiresGoat: true }
+  },
+  {
+    path: '/games/:slug/edit',
+    name: 'game-edit',
+    component: () => import('@/views/games/GameFormView.vue'),
+    meta: { requiresAuth: true, requiresGoat: true }
+  },
+  {
     path: '/games/:slug',
     name: 'game-detail',
     component: () => import('@/views/games/GameDetailView.vue')
@@ -73,6 +85,26 @@ const routes = [
     component: () => import('@/views/content/PostsView.vue')
   },
   {
+    path: '/community',
+    name: 'community',
+    component: () => import('@/views/community/CommunityView.vue')
+  },
+  {
+    path: '/community/groups/:slug',
+    name: 'group-detail',
+    component: () => import('@/views/community/GroupDetailView.vue')
+  },
+  {
+    path: '/community/forums/:slug',
+    name: 'forum-detail',
+    component: () => import('@/views/community/ForumDetailView.vue')
+  },
+  {
+    path: '/community/forums/:forumSlug/topics/:topicSlug',
+    name: 'topic-detail',
+    component: () => import('@/views/community/TopicDetailView.vue')
+  },
+  {
     path: '/posts/:slug',
     name: 'post-detail',
     component: () => import('@/views/content/PostDetailView.vue')
@@ -81,6 +113,12 @@ const routes = [
     path: '/profile',
     name: 'profile',
     component: () => import('@/views/ProfileView.vue'),
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/notifications',
+    name: 'notifications',
+    component: () => import('@/views/NotificationsView.vue'),
     meta: { requiresAuth: true }
   },
   {
@@ -100,18 +138,6 @@ const routes = [
     name: 'achievements',
     component: () => import('@/views/AchievementsView.vue'),
     meta: { requiresAuth: true }
-  },
-  {
-    path: '/games/new',
-    name: 'game-create',
-    component: () => import('@/views/games/GameFormView.vue'),
-    meta: { requiresAuth: true, requiresGoat: true }
-  },
-  {
-    path: '/games/:slug/edit',
-    name: 'game-edit',
-    component: () => import('@/views/games/GameFormView.vue'),
-    meta: { requiresAuth: true, requiresGoat: true }
   },
   {
     path: '/news/new',

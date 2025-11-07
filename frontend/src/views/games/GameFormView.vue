@@ -102,7 +102,12 @@
         <!-- Fecha de lanzamiento -->
         <div>
           <label class="block text-sm font-medium mb-2">Fecha de Lanzamiento</label>
-          <input v-model="form.release_date" type="date" class="input">
+          <DatePicker
+            v-model="form.release_date"
+            placeholder="Selecciona la fecha de lanzamiento"
+            :max-date="new Date()"
+            :year-range="[1970, new Date().getFullYear()]"
+          />
         </div>
 
         <!-- Jugadores -->
@@ -207,6 +212,7 @@ import { ref, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import api from '@/api/axios'
+import DatePicker from '@/components/common/DatePicker.vue'
 
 const router = useRouter()
 const route = useRoute()
