@@ -141,7 +141,10 @@ const getNotificationIcon = (type) => {
     'join_request': '🚪',
     'join_approved': '✅',
     'join_rejected': '❌',
-    'group_post': '📢'
+    'group_post': '📢',
+    'group_invitation': '📨',
+    'invitation_accepted': '✅',
+    'invitation_rejected': '❌'
   }
   return icons[type] || '🔔'
 }
