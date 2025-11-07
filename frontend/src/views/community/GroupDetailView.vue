@@ -40,8 +40,32 @@
                   </div>
                 </div>
 
-                <!-- Join/Leave Button -->
-                <div v-if="authStore.isAuthenticated">
+                <!-- Join/Leave/Edit Buttons -->
+                <div v-if="authStore.isAuthenticated" class="flex items-center gap-3">
+                  <!-- Invite button for creator -->
+                  <button
+                    v-if="group.creator.id === authStore.user?.id"
+                    @click="showInviteModal = true"
+                    class="btn btn-primary"
+                  >
+                    <svg class="w-5 h-5 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+                    </svg>
+                    Invitar Usuario
+                  </button>
+
+                  <!-- Edit button for creator -->
+                  <button
+                    v-if="group.creator.id === authStore.user?.id"
+                    @click="showEditModal = true"
+                    class="btn btn-secondary"
+                  >
+                    <svg class="w-5 h-5 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                    </svg>
+                    Editar Grupo
+                  </button>
+
                   <!-- Pending join request -->
                   <button
                     v-if="!group.is_member && group.has_pending_request"
@@ -153,8 +177,8 @@
               :key="tab.id"
               @click="activeTab = tab.id"
               class="px-6 py-4 font-medium transition-colors"
-              :class="activeTab === tab.id 
-                ? 'text-primary-400 border-b-2 border-primary-400' 
+              :class="activeTab === tab.id
+                ? 'text-primary-400 border-b-2 border-primary-400'
                 : 'text-dark-400 hover:text-dark-200'"
             >
               <span class="mr-2">{{ tab.icon }}</span>
@@ -177,7 +201,7 @@
                       placeholder="Comparte algo con el grupo..."
                       class="input mb-3 min-h-[100px]"
                     ></textarea>
-                    
+
                     <!-- Post Type Selector -->
                     <div class="flex items-center gap-2 mb-3">
                       <button
@@ -185,8 +209,8 @@
                         :key="type.value"
                         @click="newPost.post_type = type.value"
                         class="px-3 py-2 rounded-lg text-sm transition"
-                        :class="newPost.post_type === type.value 
-                          ? 'bg-primary-600 text-white' 
+                        :class="newPost.post_type === type.value
+                          ? 'bg-primary-600 text-white'
                           : 'bg-dark-700 text-dark-300 hover:bg-dark-600'"
                       >
                         {{ type.icon }} {{ type.label }}
@@ -339,7 +363,7 @@
             <!-- Members Tab -->
             <div v-if="activeTab === 'members'">
               <h3 class="text-xl font-display font-bold mb-4">Miembros ({{ members.length }})</h3>
-              
+
               <div v-if="loadingMembers" class="text-center py-8">
                 <div class="inline-block w-8 h-8 border-4 border-primary-600 border-t-transparent rounded-full animate-spin"></div>
               </div>
@@ -370,6 +394,22 @@
     <div v-else class="text-center py-12 text-dark-400">
       Grupo no encontrado
     </div>
+
+    <!-- Edit Group Modal -->
+    <EditGroupModal
+      v-if="showEditModal && group"
+      :group="group"
+      @close="showEditModal = false"
+      @updated="onGroupUpdated"
+    />
+
+    <!-- Invite User Modal -->
+    <InviteUserModal
+      v-if="showInviteModal && group"
+      :group="group"
+      @close="showInviteModal = false"
+      @invited="onUserInvited"
+    />
   </div>
 </template>
 
@@ -379,6 +419,8 @@ import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import api from '@/api/axios'
 import UserAvatar from '@/components/common/UserAvatar.vue'
+import EditGroupModal from '@/components/community/EditGroupModal.vue'
+import InviteUserModal from '@/components/community/InviteUserModal.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -395,6 +437,8 @@ const leavingGroup = ref(false)
 const creatingPost = ref(false)
 const pendingRequests = ref([])
 const activeTab = ref('posts')
+const showEditModal = ref(false)
+const showInviteModal = ref(false)
 const tabs = [
   { id: 'posts', label: 'Publicaciones', icon: '📝' },
   { id: 'members', label: 'Miembros', icon: '👥' },
@@ -410,10 +454,10 @@ const newPost = ref({
 })
 
 const postTypes = [
-  { value: 'text', label: 'Texto', icon: '📝' },
-  { value: 'image', label: 'Imagen', icon: '🖼️' },
-  { value: 'video', label: 'Video', icon: '🎥' },
-  { value: 'link', label: 'Enlace', icon: '🔗' },
+  { value: 'text', label: 'Texto', icon: '' },
+  { value: 'image', label: 'Imagen', icon: '' },
+  { value: 'video', label: 'Video', icon: '' },
+  { value: 'link', label: 'Enlace', icon: '' },
 ]
 
 const imagePreview = ref(null)
@@ -427,7 +471,7 @@ const isContentVisible = computed(() => {
 const canManageRequests = computed(() => {
   if (!group.value || !authStore.user) return false
   if (group.value.creator.id === authStore.user.id) return true
-  
+
   const userMembership = members.value.find(m => m.user.id === authStore.user.id)
   return userMembership && (userMembership.role === 'admin' || userMembership.role === 'moderator')
 })
@@ -453,7 +497,7 @@ async function loadGroup() {
 
 async function loadPosts() {
   if (!isContentVisible.value) return
-  
+
   loadingPosts.value = true
   try {
     const response = await api.get('/community/group-posts/', {
@@ -493,12 +537,12 @@ async function joinGroup() {
   try {
     const response = await api.post(`/community/groups/${route.params.slug}/join/`)
     const message = response.data?.message || 'Te has unido al grupo'
-    
+
     // Show different message for private groups
     if (message.includes('Solicitud')) {
       alert('Solicitud enviada. El creador del grupo la revisar\u00e1 pronto.')
     }
-    
+
     await loadGroup()
     if (group.value.is_member) {
       await loadPosts()
@@ -540,7 +584,7 @@ async function rejectRequest(requestId) {
 
 async function leaveGroup() {
   if (!confirm('¿Estás seguro de que quieres abandonar el grupo?')) return
-  
+
   leavingGroup.value = true
   try {
     await api.post(`/community/groups/${route.params.slug}/leave/`)
@@ -577,7 +621,7 @@ async function createPost() {
     })
 
     posts.value.unshift(response.data)
-    
+
     // Reset form
     newPost.value = {
       content: '',
@@ -645,8 +689,17 @@ function formatDate(date) {
   if (minutes < 60) return `Hace ${minutes}m`
   if (hours < 24) return `Hace ${hours}h`
   if (days < 7) return `Hace ${days}d`
-  
+
   return d.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })
+}
+
+function onGroupUpdated(updatedGroup) {
+  group.value = updatedGroup
+  showEditModal.value = false
+}
+
+function onUserInvited() {
+  showInviteModal.value = false
 }
 
 onMounted(async () => {
@@ -654,7 +707,7 @@ onMounted(async () => {
   if (isContentVisible.value) {
     await Promise.all([loadPosts(), loadMembers()])
   }
-  
+
   // Load join requests if user can manage them
   if (group.value && authStore.isAuthenticated) {
     await loadJoinRequests()

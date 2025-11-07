@@ -102,7 +102,8 @@
                   {{ getTypeLabel(notification.type) }}
                 </span>
                 
-                <!-- Action button for join requests -->
+                <!-- Action buttons -->
+                <!-- Join requests -->
                 <div v-if="notification.type === 'join_request' && notification.metadata" class="flex gap-2">
                   <button
                     @click.stop="approveRequest(notification)"
@@ -112,6 +113,22 @@
                   </button>
                   <button
                     @click.stop="rejectRequest(notification)"
+                    class="text-xs px-3 py-1 rounded bg-red-600 hover:bg-red-700 text-white transition"
+                  >
+                    ✗ Rechazar
+                  </button>
+                </div>
+                
+                <!-- Group invitations -->
+                <div v-if="notification.type === 'group_invitation' && notification.metadata" class="flex gap-2">
+                  <button
+                    @click.stop="acceptInvitation(notification)"
+                    class="text-xs px-3 py-1 rounded bg-green-600 hover:bg-green-700 text-white transition"
+                  >
+                    ✓ Aceptar
+                  </button>
+                  <button
+                    @click.stop="rejectInvitation(notification)"
                     class="text-xs px-3 py-1 rounded bg-red-600 hover:bg-red-700 text-white transition"
                   >
                     ✗ Rechazar
@@ -159,7 +176,10 @@ const getNotificationIcon = (type) => {
     'join_request': '🚪',
     'join_approved': '✅',
     'join_rejected': '❌',
-    'group_post': '📢'
+    'group_post': '📢',
+    'group_invitation': '📨',
+    'invitation_accepted': '✅',
+    'invitation_rejected': '❌'
   }
   return icons[type] || '🔔'
 }
@@ -178,7 +198,10 @@ const getTypeLabel = (type) => {
     'join_request': 'Solicitud de grupo',
     'join_approved': 'Solicitud aprobada',
     'join_rejected': 'Solicitud rechazada',
-    'group_post': 'Nueva publicación'
+    'group_post': 'Nueva publicación',
+    'group_invitation': 'Invitación a grupo',
+    'invitation_accepted': 'Invitación aceptada',
+    'invitation_rejected': 'Invitación rechazada'
   }
   return labels[type] || 'Notificación'
 }
@@ -262,6 +285,42 @@ const rejectRequest = async (notification) => {
   } catch (error) {
     console.error('Error rejecting request:', error)
     alert(error.response?.data?.detail || 'Error al rechazar solicitud')
+  }
+}
+
+const acceptInvitation = async (notification) => {
+  if (!notification.metadata || !notification.metadata.invitation_id) return
+  
+  try {
+    await api.post('/auth/users/accept_group_invitation/', {
+      invitation_id: notification.metadata.invitation_id
+    })
+    
+    // Mark as read and reload
+    notification.is_read = true
+    await loadNotifications()
+    alert('Invitación aceptada. Ya eres miembro del grupo.')
+  } catch (error) {
+    console.error('Error accepting invitation:', error)
+    alert(error.response?.data?.detail || 'Error al aceptar invitación')
+  }
+}
+
+const rejectInvitation = async (notification) => {
+  if (!notification.metadata || !notification.metadata.invitation_id) return
+  
+  try {
+    await api.post('/auth/users/reject_group_invitation/', {
+      invitation_id: notification.metadata.invitation_id
+    })
+    
+    // Mark as read and reload
+    notification.is_read = true
+    await loadNotifications()
+    alert('Invitación rechazada')
+  } catch (error) {
+    console.error('Error rejecting invitation:', error)
+    alert(error.response?.data?.detail || 'Error al rechazar invitación')
   }
 }
 
