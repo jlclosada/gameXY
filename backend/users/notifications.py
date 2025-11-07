@@ -107,3 +107,107 @@ class NotificationService:
             is_read=True,
             read_at=timezone.now()
         )
+    
+    @staticmethod
+    def notify_forum_post_reply(post, topic_author):
+        """Notificar al autor del tema cuando alguien responde"""
+        NotificationService.create_notification(
+            recipient=topic_author,
+            sender=post.author,
+            notification_type='post_reply',
+            title='Nueva respuesta en tu tema',
+            message=f'{post.author.username} respondió a tu tema',
+            content_object=post,
+            action_url=f'/community/forums/{post.topic.forum.slug}/topics/{post.topic.slug}'
+        )
+    
+    @staticmethod
+    def notify_group_post_comment(comment, post_author):
+        """Notificar al autor del post cuando alguien comenta"""
+        NotificationService.create_notification(
+            recipient=post_author,
+            sender=comment.author,
+            notification_type='group_post_comment',
+            title='Nuevo comentario en tu publicación',
+            message=f'{comment.author.username} comentó tu publicación',
+            content_object=comment,
+            action_url=f'/community/groups/{comment.post.group.slug}'
+        )
+    
+    @staticmethod
+    def notify_join_request(join_request, group_creator):
+        """Notificar al creador del grupo sobre solicitud de ingreso"""
+        NotificationService.create_notification(
+            recipient=group_creator,
+            sender=join_request.user,
+            notification_type='join_request',
+            title='Nueva solicitud para unirse a tu grupo',
+            message=f'{join_request.user.username} quiere unirse a {join_request.group.name}',
+            content_object=join_request,
+            action_url=f'/community/groups/{join_request.group.slug}'
+        )
+    
+    @staticmethod
+    def notify_join_approved(join_request):
+        """Notificar al usuario que su solicitud fue aprobada"""
+        NotificationService.create_notification(
+            recipient=join_request.user,
+            sender=None,
+            notification_type='join_approved',
+            title='Solicitud aprobada',
+            message=f'Tu solicitud para unirte a {join_request.group.name} fue aprobada',
+            content_object=join_request.group,
+            action_url=f'/community/groups/{join_request.group.slug}'
+        )
+    
+    @staticmethod
+    def notify_join_rejected(join_request):
+        """Notificar al usuario que su solicitud fue rechazada"""
+        NotificationService.create_notification(
+            recipient=join_request.user,
+            sender=None,
+            notification_type='join_rejected',
+            title='Solicitud rechazada',
+            message=f'Tu solicitud para unirte a {join_request.group.name} fue rechazada',
+            content_object=join_request.group,
+            action_url='/community'
+        )
+    
+    @staticmethod
+    def notify_group_invitation(invitation):
+        """Notificar al usuario sobre invitación a grupo"""
+        NotificationService.create_notification(
+            recipient=invitation.invitee,
+            sender=invitation.inviter,
+            notification_type='group_invitation',
+            title='Invitación a grupo',
+            message=f'{invitation.inviter.username} te ha invitado a unirte a {invitation.group.name}',
+            content_object=invitation,
+            action_url=f'/community/groups/{invitation.group.slug}'
+        )
+    
+    @staticmethod
+    def notify_invitation_accepted(invitation):
+        """Notificar al invitador que se aceptó la invitación"""
+        NotificationService.create_notification(
+            recipient=invitation.inviter,
+            sender=invitation.invitee,
+            notification_type='invitation_accepted',
+            title='Invitación aceptada',
+            message=f'{invitation.invitee.username} ha aceptado tu invitación a {invitation.group.name}',
+            content_object=invitation.group,
+            action_url=f'/community/groups/{invitation.group.slug}'
+        )
+    
+    @staticmethod
+    def notify_invitation_rejected(invitation):
+        """Notificar al invitador que se rechazó la invitación"""
+        NotificationService.create_notification(
+            recipient=invitation.inviter,
+            sender=invitation.invitee,
+            notification_type='invitation_rejected',
+            title='Invitación rechazada',
+            message=f'{invitation.invitee.username} ha rechazado tu invitación a {invitation.group.name}',
+            content_object=invitation.group,
+            action_url=f'/community/groups/{invitation.group.slug}'
+        )

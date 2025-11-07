@@ -115,6 +115,15 @@ class Notification(models.Model):
         ('new_guide_favorite_game', 'Nueva guía de juego favorito'),
         ('new_follower', 'Nuevo seguidor'),
         ('system', 'Notificación del sistema'),
+        ('post_reply', 'Respuesta en foro'),
+        ('group_post_comment', 'Comentario en grupo'),
+        ('join_request', 'Solicitud para unirse al grupo'),
+        ('join_approved', 'Solicitud aprobada'),
+        ('join_rejected', 'Solicitud rechazada'),
+        ('group_post', 'Nueva publicación en grupo'),
+        ('group_invitation', 'Invitación a grupo'),
+        ('invitation_accepted', 'Invitación aceptada'),
+        ('invitation_rejected', 'Invitación rechazada'),
     ]
     
     recipient = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notifications')

@@ -64,6 +64,7 @@ urlpatterns = [
     path('api/auth/', include('users.urls')),
     path('api/games/', include('games.urls')),
     path('api/content/', include('content.urls')),
+    path('api/community/', include('community.urls')),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 ]
 

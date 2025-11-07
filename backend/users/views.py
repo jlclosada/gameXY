@@ -203,21 +203,54 @@ class UserViewSet(viewsets.ModelViewSet):
     def notifications(self, request):
         """Obtener notificaciones del usuario"""
         from .models import Notification
+        from community.models import GroupJoinRequest, GroupInvitation
         notifications = request.user.notifications.all()[:50]  # Últimas 50
         
-        data = [{
-            'id': n.id,
-            'type': n.notification_type,
-            'title': n.title,
-            'message': n.message,
-            'action_url': n.action_url,
-            'is_read': n.is_read,
-            'created_at': n.created_at,
-            'sender': {
-                'username': n.sender.username,
-                'avatar': n.sender.avatar.url if n.sender and n.sender.avatar else None
-            } if n.sender else None
-        } for n in notifications]
+        data = []
+        for n in notifications:
+            # Build sender data with full avatar URL
+            sender_data = None
+            if n.sender:
+                avatar_url = None
+                if n.sender.avatar:
+                    avatar_url = request.build_absolute_uri(n.sender.avatar.url)
+                sender_data = {
+                    'username': n.sender.username,
+                    'avatar': avatar_url
+                }
+            
+            notif_data = {
+                'id': n.id,
+                'type': n.notification_type,
+                'title': n.title,
+                'message': n.message,
+                'action_url': n.action_url,
+                'is_read': n.is_read,
+                'created_at': n.created_at,
+                'sender': sender_data
+            }
+            
+            # Add metadata for join requests
+            if n.notification_type == 'join_request' and n.content_object:
+                if isinstance(n.content_object, GroupJoinRequest):
+                    notif_data['metadata'] = {
+                        'request_id': n.content_object.id,
+                        'group_slug': n.content_object.group.slug,
+                        'group_name': n.content_object.group.name,
+                        'status': n.content_object.status
+                    }
+            
+            # Add metadata for group invitations
+            if n.notification_type == 'group_invitation' and n.content_object:
+                if isinstance(n.content_object, GroupInvitation):
+                    notif_data['metadata'] = {
+                        'invitation_id': n.content_object.id,
+                        'group_slug': n.content_object.group.slug,
+                        'group_name': n.content_object.group.name,
+                        'status': n.content_object.status
+                    }
+            
+            data.append(notif_data)
         
         return Response(data)
     
@@ -245,3 +278,65 @@ class UserViewSet(viewsets.ModelViewSet):
         from .notifications import NotificationService
         NotificationService.mark_all_as_read(request.user)
         return Response({'status': 'all marked as read'})
+    
+    @action(detail=False, methods=['post'], permission_classes=[IsAuthenticated])
+    def accept_group_invitation(self, request):
+        """Aceptar invitación a grupo"""
+        from community.models import GroupInvitation, GroupMembership
+        invitation_id = request.data.get('invitation_id')
+        
+        if not invitation_id:
+            return Response({'detail': 'invitation_id es requerido'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            invitation = GroupInvitation.objects.get(id=invitation_id, invitee=request.user, status='pending')
+        except GroupInvitation.DoesNotExist:
+            return Response({'detail': 'Invitación no encontrada'}, status=status.HTTP_404_NOT_FOUND)
+        
+        # Add user to group
+        GroupMembership.objects.get_or_create(
+            group=invitation.group,
+            user=request.user,
+            defaults={'role': 'member'}
+        )
+        
+        # Update invitation status
+        invitation.status = 'accepted'
+        invitation.save()
+        
+        return Response({'detail': 'Invitación aceptada'})
+    
+    @action(detail=False, methods=['post'], permission_classes=[IsAuthenticated])
+    def reject_group_invitation(self, request):
+        """Rechazar invitación a grupo"""
+        from community.models import GroupInvitation
+        invitation_id = request.data.get('invitation_id')
+        
+        if not invitation_id:
+            return Response({'detail': 'invitation_id es requerido'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            invitation = GroupInvitation.objects.get(id=invitation_id, invitee=request.user, status='pending')
+        except GroupInvitation.DoesNotExist:
+            return Response({'detail': 'Invitación no encontrada'}, status=status.HTTP_404_NOT_FOUND)
+        
+        # Update invitation status
+        invitation.status = 'rejected'
+        invitation.save()
+        
+        return Response({'detail': 'Invitación rechazada'})
+    
+    @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
+    def search(self, request):
+        """Buscar usuarios por username"""
+        query = request.query_params.get('q', '')
+        if len(query) < 2:
+            return Response({'results': []})
+        
+        users = User.objects.filter(
+            username__icontains=query,
+            is_active=True
+        )[:10]
+        
+        serializer = UserPublicSerializer(users, many=True)
+        return Response({'results': serializer.data})
